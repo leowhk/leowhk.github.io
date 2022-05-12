@@ -16,6 +16,30 @@ var map = L.map('map-canvas', { // eslint-disable-line no-undef
 });
 map.attributionControl.setPrefix('');
 
+
+//0. Geolocation
+map.locate({setView: true, maxZoom: 16});
+
+function onLocationFound(e) {
+    var radius = e.accuracy;
+
+    L.marker(e.latlng).addTo(map)
+        .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+    L.circle(e.latlng, radius).addTo(map);
+}
+
+map.on('locationfound', onLocationFound);
+//
+
+
+function onLocationError(e) {
+    alert(e.message);
+}
+
+map.on('locationerror', onLocationError);
+
+
 // 1. BRT-Achtergrondkaart van PDOK:
 var options = { maxZoom: 14, attribution: 'Map data: <a href="http://www.pdok.nl">BRT Achtergrondkaart</a>' }
 var basemap_pdok = new L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:28992/{z}/{x}/{y}.png', options);
@@ -26,7 +50,7 @@ basemap_pdok.getAttribution = function () {
 }
 basemap_pdok.addTo(map);
 
-// // // 2. alternative base map: aerial photo - can be switched on/off by toggle thru L.control.layers (see below in this script)
+// // 2. alternative base map: aerial photo - can be switched on/off by toggle thru L.control.layers (see below in this script)
 // var wms_aerial = "http://geodata1.nationaalgeoregister.nl/luchtfoto/wms?";
 // var basemap_aerial = new L.tileLayer.wms(wms_aerial, {
 //     layers: ['luchtfoto_png'],
@@ -95,7 +119,7 @@ var geocoder = L.Control.geocoder({
 var popup = L.popup();
 
 var url_wfs = 'https://varioscale.bk.tudelft.nl/geoserver/geoweb/ows?';
-var featuretype = "geoweb:events_all" ;
+var featuretype = "geoweb:events_all" ;		
 var namespace_prefix = "geoweb" ;
 var namespace_uri = "http://all.kinds.of.data" ;
 var geomPropertyName = "geoweb:geom" ;
